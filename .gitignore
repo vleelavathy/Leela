@@ -1,0 +1,108 @@
+############################################
+# Terraform (VERY IMPORTANT)
+############################################
+
+# Local .terraform directory
+.terraform/
+.terraform*
+.terraform.*
+
+# State files (NEVER commit)
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Terraform plan files
+*.tfplan
+*.plan
+
+# Sensitive variable files
+*.tfvars
+*.tfvars.json
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI config
+.terraformrc
+terraform.rc
+
+############################################
+# Azure / Secrets
+############################################
+
+# Service principal credentials
+*.env
+.env
+.env.*
+secrets.json
+credentials.json
+
+############################################
+# VS Code
+############################################
+
+.vscode/
+
+############################################
+# Visual Studio
+############################################
+
+.vs/
+bin/
+obj/
+Debug/
+Release/
+*.user
+*.suo
+*.cache
+*.pdb
+
+############################################
+# Node (if using frontend apps)
+############################################
+
+node_modules/
+dist/
+build/
+npm-debug.log
+yarn-error.log
+
+############################################
+# Python (if using scripts)
+############################################
+
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+############################################
+# Docker
+############################################
+
+.dockerignore
+
+############################################
+# OS junk
+############################################
+
+.DS_Store
+Thumbs.db
+
+############################################
+# Logs
+############################################
+
+*.log
+
+############################################
+# Misc
+############################################
+
+*.bak
+*.tmp
+*.swp
