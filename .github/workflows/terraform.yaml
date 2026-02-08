@@ -2,14 +2,15 @@ name: Terraform Deploy (Azure)
 
 on:
   push:
-    branches: main
+    branches: none
 
   workflow_dispatch:
-    env:
-        environment:
+    inputs:
+      environment:
         description: 'Select the environment to deploy to'
         required: true
-        choices:
+        type: choice
+        options:
           - dev
           - staging
           - prod
@@ -48,19 +49,19 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: env.WORKING_DIRECTORY
+        working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Terraform Format Check
         run: terraform fmt -check
-        working-directory: env.WORKING_DIRECTORY
+        working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: env.WORKING_DIRECTORY
+        working-directory: ${{ env.WORKING_DIRECTORY }}
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-        working-directory: ./terraform
+        working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-        working-directory: env.WORKING_DIRECTORY
+        working-directory: ${{ env.WORKING_DIRECTORY }}
