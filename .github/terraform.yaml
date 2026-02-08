@@ -2,7 +2,7 @@ name: Terraform Deploy (Azure)
 
 on:
   push:
-    branches: none
+    branches: main
 
   workflow_dispatch:
         environment:
