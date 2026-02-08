@@ -20,3 +20,8 @@ variable "appName" {
     description = "appName"
     type = string
 }
+
+variable "resource_group" {
+    description = "resource_group"
+    type = string
+}
