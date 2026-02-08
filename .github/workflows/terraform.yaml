@@ -60,7 +60,7 @@ jobs:
         working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        run: terraform plan -input=false -out=tfplan
         working-directory: ${{ env.WORKING_DIRECTORY }}
 
       - name: Terraform Apply
