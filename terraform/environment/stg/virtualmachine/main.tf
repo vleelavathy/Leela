@@ -1,5 +1,5 @@
 module "storage_account" {
-  source = "../../../module/virtualmachine"
+  source = "../../module/virtualmachine"
   location = var.location
   owner = var.owner
   environment = var.environment

@@ -1,5 +1,5 @@
 module "storage_account" {
-  source = "../../../module/storage_account"
+  source = "../../module/storage_account"
   location = var.location
   owner = var.owner
   environment = var.environment

@@ -1,5 +1,5 @@
 module "vnet" {
-  source = "../../../module/vnet_subnet"
+  source = "../../module/vnet_subnet"
   location = var.location
   owner = var.owner
   environment = var.environment
