@@ -45,21 +45,19 @@ resource "azurerm_linux_web_app" "webapp" {
   }
 }
 
-# OPTIONAL: Staging slot (very useful for CI/CD)
-resource "azurerm_linux_web_app_slot" "staging" {
-  name           = "staging"
-  app_service_id = azurerm_linux_web_app.webapp.id
+resource "azurerm_windows_web_app" "webapp" {
+  name                = var.appName
+  resource_group_name = var.resource_group
+  location            = var.location
+  service_plan_id     = azurerm_service_plan.plan.id
 
   https_only = true
 
   site_config {
-    always_on = true
-    application_stack {
-      dotnet_version = "8.0"
-    }
+    always_on = false
   }
 
   app_settings = {
-    "SLOT_NAME" = "staging"
+    "ENVIRONMENT" = var.environment
   }
 }
