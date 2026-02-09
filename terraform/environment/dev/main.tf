@@ -24,3 +24,12 @@ module "vnet" {
   appName = var.appName
   resource_group = var.resource_group
 }
+
+module "webapp" {
+  source = "../../module/webapp"
+  location = var.location
+  owner = var.owner
+  environment = var.environment
+  appName = var.appName
+  resource_group = var.resource_group
+}
