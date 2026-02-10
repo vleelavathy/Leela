@@ -7,8 +7,10 @@ resource "azurerm_log_analytics_workspace" "law" {
   resource_group_name = var.resource_group
   sku                 = "PerGB2018"
   retention_in_days   = 30
-
-  tags = azurerm_resource_group.rg.tags
+    tags = {
+    Environment = var.environment
+    Owner       = var.owner
+  }
 }
 
 # -------------------------
@@ -19,9 +21,11 @@ resource "azurerm_container_app_environment" "cae" {
   location                   = var.location
   resource_group_name        = var.resource_group
   log_analytics_workspace_id = azurerm_log_analytics_workspace.law.id
-
-  tags = azurerm_resource_group.rg.tags
-}
+    tags = {
+    Environment = var.environment
+    Owner       = var.owner
+  }
+  }
 
 # -------------------------
 # Container App (public ingress)
@@ -47,6 +51,7 @@ resource "azurerm_container_app" "app" {
           value = env.value
         }
       }
+
     }
 
     min_replicas = 1
@@ -63,6 +68,8 @@ resource "azurerm_container_app" "app" {
       percentage      = 100
     }
   }
-
-  tags = azurerm_resource_group.rg.tags
+tags = {
+    Environment = var.environment
+    Owner       = var.owner
+  }
 }

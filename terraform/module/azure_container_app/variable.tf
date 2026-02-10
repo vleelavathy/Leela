@@ -25,4 +25,8 @@ variable "environment_variables" {
 	type        = map(string)
 	default     = {}
 }
-
+variable "owner" {
+  description = "Owner tag for the Resource Group."
+  type        = string
+  default     = "Admin"
+}
