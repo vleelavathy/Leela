@@ -25,10 +25,10 @@ module "vnet" {
   resource_group = var.resource_group
 }
 
-module "webapp" {
-  source = "../../module/webapp"
+module "aca-01" {
+  source = "../../module/azure_container_app"
   location = var.location
-  owner = var.owner
+  environment_variables = var.environment_variables
   environment = var.environment
   appName = var.appName
   resource_group = var.resource_group
