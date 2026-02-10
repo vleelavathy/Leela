@@ -41,7 +41,7 @@ resource "azurerm_container_app" "app" {
       name   = "${var.appName}-${var.location}-${var.environment}-container"
       image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"    
       cpu    = 2
-      memory = "2Gi"
+      memory = "4Gi"
 
       # Optional: pass env vars
       dynamic "env" {
