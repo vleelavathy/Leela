@@ -19,7 +19,7 @@ permissions:
 env:
   REGISTRY_NAME: westus2devacr
   IMAGE_NAME: currency-dashboard
-  DOCKERFILE_PATH: currency-dashboard/Dockerfile
+  DOCKERFILE_PATH: .github/docker/Dockerfile
   BUILD_CONTEXT: currency-dashboard
 
   
