@@ -17,7 +17,7 @@ permissions:
   contents: read
 
 env:
-  REGISTRY_NAME: eastusdev
+  REGISTRY_NAME: westus2devacr
   IMAGE_NAME: currency-dashboard
   DOCKERFILE_PATH: ./currency-dashboard/dockerFile
   DOCKER_CONTEXT: ./currency-dashboard
