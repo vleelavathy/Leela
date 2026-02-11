@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Select the environment'
+        description: "Select the environment"
         required: true
         type: choice
         options:
@@ -22,90 +22,105 @@ env:
   DOCKERFILE_PATH: .github/docker/Dockerfile
   SOURCE_LOCATION: ./currency-dashboard
 
-  
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    
+
     env:
       ENVIRONMENT: ${{ github.event.inputs.environment }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # -------------------------
+      # Checkout
+      # -------------------------
+      - uses: actions/checkout@v4
 
-      - name: Azure Login (OIDC)
+      # -------------------------
+      # Fix Docker context (important)
+      # -------------------------
+      - name: Reset Docker context
+        run: |
+          unset DOCKER_CONTEXT || true
+          rm -rf ~/.docker/contexts || true
+          docker context use default || true
+
+      # -------------------------
+      # Azure Login (OIDC)
+      # -------------------------
+      - name: Azure Login
         uses: azure/login@v2
         with:
           client-id: ${{ vars.ARM_CLIENT_ID }}
           tenant-id: ${{ vars.ARM_TENANT_ID }}
           subscription-id: ${{ vars.ARM_SUBSCRIPTION_ID }}
 
-      - name: Get ACR Login Credentials
-        id: acr-login
-        run: |
-          # Get ACR login server and credentials
-          ACR_LOGIN_SERVER=$(az acr show \
-            --name ${{ env.REGISTRY_NAME }} \
-            --query loginServer \
-            --output tsv)
-          
-          echo "acr_login_server=${ACR_LOGIN_SERVER}" >> $GITHUB_OUTPUT
-          
-          # Generate ACR access token
-          ACR_TOKEN=$(az acr login \
-            --name ${{ env.REGISTRY_NAME }} \
-            --expose-token \
-            --output tsv \
-            --query accessToken)
-          
-          echo "acr_token=${ACR_TOKEN}" >> $GITHUB_OUTPUT
-
+      # -------------------------
+      # Validate paths
+      # -------------------------
       - name: Validate paths
-        shell: bash
-        run: |
-          set -e
-          echo "PWD: $(pwd)"
-          echo "Listing repo root:"
-          ls -la
-          echo ""
-          echo "Listing currency-dashboard folder:"
-          ls -la currency-dashboard
-          echo ""
-          echo "Dockerfile path: $DOCKERFILE_PATH"
-          test -f "$DOCKERFILE_PATH"
-
-
-      - name: Build & Push image using ACR Build
-        shell: bash
         run: |
           set -euo pipefail
-          echo "Building from SOURCE_LOCATION=${SOURCE_LOCATION}"
-          az acr build \
-            --registry "${REGISTRY_NAME}" \
-            --image "${IMAGE_NAME}:${GITHUB_SHA}" \
-            --image "${IMAGE_NAME}:latest" \
-            --image "${IMAGE_NAME}:${ENVIRONMENT}-latest" \
+          echo "Checking Dockerfile..."
+          test -f "${DOCKERFILE_PATH}"
+          echo "Checking build context..."
+          test -d "${SOURCE_LOCATION}"
+          ls -la "${SOURCE_LOCATION}"
+
+      # -------------------------
+      # Get ACR login server
+      # -------------------------
+      - name: Get ACR login server
+        id: acr
+        run: |
+          ACR_LOGIN_SERVER=$(az acr show \
+            --name "${REGISTRY_NAME}" \
+            --query loginServer -o tsv)
+
+          echo "acr_login_server=${ACR_LOGIN_SERVER}" >> $GITHUB_OUTPUT
+
+      # -------------------------
+      # Login to ACR using token
+      # -------------------------
+      - name: Login to ACR
+        run: |
+          TOKEN=$(az acr login \
+            --name "${REGISTRY_NAME}" \
+            --expose-token \
+            --query accessToken -o tsv)
+
+          echo "$TOKEN" | docker login \
+            "${{ steps.acr.outputs.acr_login_server }}" \
+            --username 00000000-0000-0000-0000-000000000000 \
+            --password-stdin
+
+      # -------------------------
+      # Setup buildx
+      # -------------------------
+        
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # -------------------------
+      # Build & Push
+      # -------------------------
+      - name: Build and Push image
+        run: |
+          REG="${{ steps.acr.outputs.acr_login_server }}"
+
+          docker buildx build \
             --file "${DOCKERFILE_PATH}" \
+            --tag "${REG}/${IMAGE_NAME}:${GITHUB_SHA}" \
+            --tag "${REG}/${IMAGE_NAME}:latest" \
+            --tag "${REG}/${IMAGE_NAME}:${ENVIRONMENT}-latest" \
+            --push \
             "${SOURCE_LOCATION}"
 
-      - name: Output Image Information
+      # -------------------------
+      # Output
+      # -------------------------
+      - name: Output image info
         run: |
-          echo "✅ Docker image successfully built and pushed to ACR"
-          echo ""
-          echo "Image Details:"
-          echo "  Registry: ${{ steps.acr-login.outputs.acr_login_server }}"
-          echo "  Image: ${{ env.IMAGE_NAME }}"
-          echo "  Tags:"
-          echo "    - ${{ steps.acr-login.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
-          echo "    - ${{ steps.acr-login.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:latest"
-          echo "    - ${{ steps.acr-login.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:${{ env.ENVIRONMENT }}-latest"
-          echo ""
-          echo "Next Steps to Update Container App:"
-          echo "1. Use the command below to update the Container App with the latest image:"
-          echo ""
-          echo "   az containerapp update \\"
-          echo "     --resource-group <resource-group-name> \\"
-          echo "     --name <container-app-name> \\"
-          echo "     --image ${{ steps.acr-login.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:latest"
+          echo "✅ Image pushed successfully"
+          echo "${{ steps.acr.outputs.acr_login_server }}/${IMAGE_NAME}:${GITHUB_SHA}"
+          echo "${{ steps.acr.outputs.acr_login_server }}/${IMAGE_NAME}:latest"
+          echo "${{ steps.acr.outputs.acr_login_server }}/${IMAGE_NAME}:${ENVIRONMENT}-latest"
