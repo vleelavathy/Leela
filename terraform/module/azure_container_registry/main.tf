@@ -2,7 +2,7 @@
 # Azure Container Registry
 # -------------------------
 resource "azurerm_container_registry" "acr" {
-  name                       = "${var.appName}-${var.location}-${var.environment}-acr"
+  name                       = "${var.appName}${var.location}${var.environment}acr"
   resource_group_name = var.resource_group
   location            = var.location
 
