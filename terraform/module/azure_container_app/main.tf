@@ -17,7 +17,7 @@ resource "azurerm_log_analytics_workspace" "law" {
 # Container Apps Environment
 # -------------------------
 resource "azurerm_container_app_environment" "cae" {
-  name                       = "${var.appName}-${var.location}-${var.environment}-cae"
+  name                       = "${var.appName}${var.location}${var.environment}cae"
   location                   = var.location
   resource_group_name        = var.resource_group
   log_analytics_workspace_id = azurerm_log_analytics_workspace.law.id
