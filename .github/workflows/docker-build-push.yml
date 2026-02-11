@@ -75,7 +75,7 @@ jobs:
         run: |
             docker build \
             -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest \
-            -f ${{ env.DOCKERFILE_PATH }} .
+            -f dockerFile .
 
       - name: Build and Push Docker Image using Azure CLI
         run: |
