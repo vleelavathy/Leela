@@ -33,3 +33,11 @@ module "aca-01" {
   appName = var.appName
   resource_group = var.resource_group
 }
+
+module "acr" {
+  source = "../../module/azure_container_registry"
+  location = var.location
+  environment = var.environment
+  appName = var.appName
+  resource_group = var.resource_group
+}
