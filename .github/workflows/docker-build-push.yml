@@ -19,8 +19,8 @@ permissions:
 env:
   REGISTRY_NAME: westus2devacr
   IMAGE_NAME: currency-dashboard
-  DOCKERFILE_PATH: ./currency-dashboard/dockerFile
-  DOCKER_CONTEXT: ./currency-dashboard
+  DOCKERFILE_PATH: ../../currency-dashboard/dockerFile
+  DOCKER_CONTEXT: ../../currency-dashboard
 
 jobs:
   build-and-push:
@@ -60,22 +60,31 @@ jobs:
           
           echo "acr_token=${ACR_TOKEN}" >> $GITHUB_OUTPUT
 
-      - name: Build Docker Image
+      - name: Echo Current Location
         run: |
-            docker build \
-            -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest \
-            -f ${{ env.DOCKERFILE_PATH }} \
-            ${{ env.DOCKER_CONTEXT }}
+          echo "Current working directory:"
+          pwd
+          echo ""
+          echo "Directory contents:"
+          ls -la
+          pwd
 
-      - name: Build and Push Docker Image using Azure CLI
-        run: |
-          az acr build \
-            --registry ${{ env.REGISTRY_NAME }} \
-            --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            --image ${{ env.IMAGE_NAME }}:latest \
-            --image ${{ env.IMAGE_NAME }}:${{ env.ENVIRONMENT }}-latest \
-            --file ${{ env.DOCKERFILE_PATH }} \
-            ${{ env.DOCKER_CONTEXT }}
+    #   - name: Build Docker Image
+    #     run: |
+    #         docker build \
+    #         -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest \
+    #         -f ${{ env.DOCKERFILE_PATH }} \
+    #         ${{ env.DOCKER_CONTEXT }}
+
+    #   - name: Build and Push Docker Image using Azure CLI
+    #     run: |
+    #       az acr build \
+    #         --registry ${{ env.REGISTRY_NAME }} \
+    #         --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
+    #         --image ${{ env.IMAGE_NAME }}:latest \
+    #         --image ${{ env.IMAGE_NAME }}:${{ env.ENVIRONMENT }}-latest \
+    #         --file ${{ env.DOCKERFILE_PATH }} \
+    #         ${{ env.DOCKER_CONTEXT }}
 
       - name: Output Image Information
         run: |
