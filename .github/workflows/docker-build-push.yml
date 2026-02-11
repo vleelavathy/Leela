@@ -68,14 +68,13 @@ jobs:
           echo ""
           echo "Directory contents:"
           ls -la
-          echo "change directory to Docker context: ${{ env.DOCKER_CONTEXT }}"
-          cd currency-dashboard/
+        #   echo "change directory to Docker context: ${{ env.DOCKER_CONTEXT }}"
+        #   cd currency-dashboard/
 
       - name: Build Docker Image
         run: |
-            docker build \
-            -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest \
-            -f dockerFile .
+          docker build -f currency-dashboard/Dockerfile -t ${{ env.IMAGE_NAME }} currency-dashboard/
+
 
       - name: Build and Push Docker Image using Azure CLI
         run: |
