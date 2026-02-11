@@ -20,7 +20,7 @@ env:
   REGISTRY_NAME: westus2devacr
   IMAGE_NAME: currency-dashboard
   DOCKERFILE_PATH: .github/docker/Dockerfile
-  BUILD_CONTEXT: currency-dashboard
+  SOURCE_LOCATION: ./currency-dashboard
 
   
 
@@ -77,15 +77,18 @@ jobs:
           test -f "$DOCKERFILE_PATH"
 
 
-      - name: Build and Push Docker Image using Azure CLI
+      - name: Build & Push image using ACR Build
+        shell: bash
         run: |
+          set -euo pipefail
+          echo "Building from SOURCE_LOCATION=${SOURCE_LOCATION}"
           az acr build \
-            --registry ${{ env.REGISTRY_NAME }} \
-            --image ${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            --image ${{ env.IMAGE_NAME }}:latest \
-            --image ${{ env.IMAGE_NAME }}:${{ env.ENVIRONMENT }}-latest \
-            --file ${{ env.DOCKERFILE_PATH }} \
-            ${{ env.DOCKER_CONTEXT }}
+            --registry "${REGISTRY_NAME}" \
+            --image "${IMAGE_NAME}:${GITHUB_SHA}" \
+            --image "${IMAGE_NAME}:latest" \
+            --image "${IMAGE_NAME}:${ENVIRONMENT}-latest" \
+            --file "${DOCKERFILE_PATH}" \
+            "${SOURCE_LOCATION}"
 
       - name: Output Image Information
         run: |
