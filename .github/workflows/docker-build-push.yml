@@ -19,8 +19,9 @@ permissions:
 env:
   REGISTRY_NAME: westus2devacr
   IMAGE_NAME: currency-dashboard
-  DOCKERFILE_PATH: currency-dashboard/dockerFile
-  DOCKER_CONTEXT: currency-dashboard/
+  DOCKERFILE_PATH: currency-dashboard/Dockerfile
+  BUILD_CONTEXT: currency-dashboard
+
   
 
 jobs:
@@ -61,19 +62,19 @@ jobs:
           
           echo "acr_token=${ACR_TOKEN}" >> $GITHUB_OUTPUT
 
-      - name: Echo Current Location
+      - name: Validate paths
+        shell: bash
         run: |
-          echo "Current working directory:"
-          pwd
-          echo ""
-          echo "Directory contents:"
+          set -e
+          echo "PWD: $(pwd)"
+          echo "Listing repo root:"
           ls -la
-        #   echo "change directory to Docker context: ${{ env.DOCKER_CONTEXT }}"
-        #   cd currency-dashboard/
-
-      - name: Build Docker Image
-        run: |
-          docker build -f currency-dashboard/Dockerfile -t ${{ env.IMAGE_NAME }} currency-dashboard/
+          echo ""
+          echo "Listing currency-dashboard folder:"
+          ls -la currency-dashboard
+          echo ""
+          echo "Dockerfile path: $DOCKERFILE_PATH"
+          test -f "$DOCKERFILE_PATH"
 
 
       - name: Build and Push Docker Image using Azure CLI
