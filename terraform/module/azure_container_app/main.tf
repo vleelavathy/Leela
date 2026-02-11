@@ -39,7 +39,7 @@ resource "azurerm_container_app" "app" {
   template {
     container {
       name   = "${var.appName}-${var.location}-${var.environment}-container"
-      image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"    
+      image  = var.container_image
       cpu    = 2
       memory = "4Gi"
 
@@ -60,7 +60,7 @@ resource "azurerm_container_app" "app" {
 
   ingress {
     external_enabled = true
-    target_port      = 80
+    target_port      = var.container_port
     transport        = "auto"
 
     traffic_weight {

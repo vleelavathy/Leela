@@ -25,6 +25,19 @@ variable "environment_variables" {
 	type        = map(string)
 	default     = {}
 }
+
+variable "container_image" {
+	description = "Container image URI (e.g., myacr.azurecr.io/app:latest)"
+	type        = string
+	default     = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+}
+
+variable "container_port" {
+	description = "Container port to expose"
+	type        = number
+	default     = 8080
+}
+
 variable "owner" {
   description = "Owner tag for the Resource Group."
   type        = string
