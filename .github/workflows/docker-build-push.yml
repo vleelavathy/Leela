@@ -21,6 +21,7 @@ env:
   IMAGE_NAME: currency-dashboard
   DOCKERFILE_PATH: currency-dashboard/dockerFile
   DOCKER_CONTEXT: currency-dashboard/
+  
 
 jobs:
   build-and-push:
@@ -67,14 +68,14 @@ jobs:
           echo ""
           echo "Directory contents:"
           ls -la
-          pwd
+          echo "change directory to Docker context: ${{ env.DOCKER_CONTEXT }}"
+          cd currency-dashboard/
 
       - name: Build Docker Image
         run: |
             docker build \
             -t ${{ env.REGISTRY_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest \
-            -f ${{ env.DOCKERFILE_PATH }} \
-            ${{ env.DOCKER_CONTEXT }}
+            -f ${{ env.DOCKERFILE_PATH }} .
 
       - name: Build and Push Docker Image using Azure CLI
         run: |
