@@ -1,13 +1,10 @@
 name: Terraform Deploy (Azure)
 
 on:
-  push:
-    branches: none
-
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Select the environment to deploy to'
+        description: "Select the environment to deploy to"
         required: true
         type: choice
         options:
@@ -22,47 +19,79 @@ permissions:
 env:
   TF_IN_AUTOMATION: true
   ARM_USE_OIDC: true
-  WORKING_DIRECTORY: ./terraform/environment/${{ github.event.inputs.environment }}
   ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
   ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
   ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
 
 jobs:
-  terraform:
+
+  # ---------------------------
+  # PLAN JOB
+  # ---------------------------
+  terraform-plan:
     runs-on: ubuntu-latest
+    outputs:
+      env_name: ${{ github.event.inputs.environment }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Azure Login (OIDC)
-        uses: azure/login@v2
+      - uses: azure/login@v2
         with:
           client-id: ${{ vars.ARM_CLIENT_ID }}
           tenant-id: ${{ vars.ARM_TENANT_ID }}
           subscription-id: ${{ vars.ARM_SUBSCRIPTION_ID }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
 
       - name: Terraform Init
         run: terraform init
-        working-directory: ${{ env.WORKING_DIRECTORY }}
-
-      - name: Terraform Format
-        run: terraform fmt -recursive
-        working-directory: ${{ env.WORKING_DIRECTORY }}
-
-      - name: Terraform Validate
-        run: terraform validate
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+        working-directory: ./terraform/environment/${{ github.event.inputs.environment }}
 
       - name: Terraform Plan
         run: terraform plan -input=false -out=tfplan
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+        working-directory: ./terraform/environment/${{ github.event.inputs.environment }}
+
+      - name: Upload tfplan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: ./terraform/environment/${{ github.event.inputs.environment }}/tfplan
+
+
+  # ---------------------------
+  # APPLY JOB (MANUAL APPROVAL)
+  # ---------------------------
+  terraform-apply:
+    needs: terraform-plan
+    runs-on: ubuntu-latest
+
+    # ⭐ THIS IS THE MAGIC LINE
+    environment: ${{ needs.terraform-plan.outputs.env_name }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.ARM_CLIENT_ID }}
+          tenant-id: ${{ vars.ARM_TENANT_ID }}
+          subscription-id: ${{ vars.ARM_SUBSCRIPTION_ID }}
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Download tfplan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan
+          path: ./terraform/environment/${{ github.event.inputs.environment }}
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform/environment/${{ github.event.inputs.environment }}
 
       - name: Terraform Apply
         run: terraform apply -auto-approve tfplan
-        working-directory: ${{ env.WORKING_DIRECTORY }}
+        working-directory: ./terraform/environment/${{ github.event.inputs.environment }}

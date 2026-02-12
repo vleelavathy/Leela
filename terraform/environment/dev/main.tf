@@ -51,3 +51,11 @@ module "azurerm_log_analytics_workspace"{
    appName = var.appName
    resource_group = var.resource_group
 }
+
+module "azurerm_container_app_environment" {
+  source = "../../module/azure_container_env"
+  location = var.location
+  environment = var.environment
+  appName = var.appName
+  resource_group = var.resource_group 
+}
