@@ -42,3 +42,12 @@ module "acr" {
   appName = var.appName
   resource_group = var.resource_group
 }
+
+
+module "azurerm_log_analytics_workspace"{
+   source = "../../module/azure_log_analytics"
+   location = var.location
+   environment = var.environment
+   appName = var.appName
+   resource_group = var.resource_group
+}
