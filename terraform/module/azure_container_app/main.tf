@@ -13,26 +13,17 @@ resource "azurerm_log_analytics_workspace" "law" {
   }
 }
 
-# -------------------------
-# Container Apps Environment
-# -------------------------
-resource "azurerm_container_app_environment" "cae" {
-  name                       = "${var.appName}-${var.location}-${var.environment}-cae"
-  location                   = var.location
-  resource_group_name        = var.resource_group
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.law.id
-    tags = {
-    Environment = var.environment
-    Owner       = var.owner
-  }
-  }
+data "azurerm_container_environment" "cae" {
+  name                = "${var.appName}-${var.location}-${var.environment}-cae"
+  resource_group_name = var.resource_group
+}
 
 # -------------------------
 # Container App (public ingress)
 # -------------------------
 resource "azurerm_container_app" "app" {
   name                         = "${var.appName}-${var.location}-${var.environment}-aca"
-  container_app_environment_id = azurerm_container_app_environment.cae.id
+  container_app_environment_id = data.azurerm_container_environment.cae.id
   resource_group_name          = var.resource_group
   revision_mode                = "Single"
 
