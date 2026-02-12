@@ -25,15 +25,15 @@ module "vnet" {
   resource_group = var.resource_group
 }
 
-# module "aca-01" {
-#   source = "../../module/azure_container_app"
-#   location = var.location
-#   environment_variables = var.environment_variables
-#   environment = var.environment
-#   appName = var.appName
-#   resource_group = var.resource_group
-#   count = 1
-# }
+module "aca-01" {
+  source = "../../module/azure_container_app"
+  location = var.location
+  environment_variables = var.environment_variables
+  environment = var.environment
+  appName = var.appName
+  resource_group = var.resource_group
+  count = 01
+}
 
 module "acr" {
   source = "../../module/azure_container_registry"
