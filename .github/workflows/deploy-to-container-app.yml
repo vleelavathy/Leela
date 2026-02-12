@@ -73,29 +73,18 @@ jobs:
           echo "ACR Login Server: ${ACR_LOGIN_SERVER}"
 
     #   # -------------------------
-    #   # Get latest image tag
+    #   # Set registry credentials
     #   # -------------------------
-    #   - name: Get latest image tag
-    #     id: image
-    #     run: |
-    #       # Get the latest tag from ACR
-    #       TAG=$(az acr repository show-tags \
-    #         --name "${REGISTRY_NAME}" \
-    #         --repository "${IMAGE_NAME}" \
-    #         --orderby time_desc \
-    #         --top 1 \
-    #         -o tsv)
-          
-    #       if [ -z "$TAG" ]; then
-    #         echo "Error: No image tags found in ACR"
-    #         exit 1
-    #       fi
-          
-    #       IMAGE_URI="${{ steps.acr.outputs.acr_login_server }}/${IMAGE_NAME}:${TAG}"
-          
-    #       echo "image_tag=${TAG}" >> $GITHUB_OUTPUT
-    #       echo "image_uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
-    #       echo "Latest image: ${IMAGE_URI}"
+      - name: Get ACR login server
+        id: set-acr-credentials
+        run: |
+            az containerapp registry set \
+            --name le-app-westus2-dev-aca \
+            --resource-group le-app-westus2-dev-rg \
+            --server westus2devacr.azurecr.io \
+            --username ${{ vars.ACR_USERNAME }} \
+            --password "${{ secrets.ACR_PASSWORD }}"
+
 
 
       # -------------------------
@@ -107,9 +96,6 @@ jobs:
             --name "${{ env.CONTAINER_APP }}" \
             --resource-group "${{ env.RESOURCE_GROUP }}" \
             --image "${{ steps.acr.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:latest" \
-            --registry-server "${{ steps.acr.outputs.acr_login_server }}" \
-            --registry-username "${{ vars.ACR_USERNAME }}" \
-            --registry-password "${{ secrets.ACR_PASSWORD }}" \
             --set-env-vars DEPLOYED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" SOURCE_TAG="latest"
 
       # -------------------------
