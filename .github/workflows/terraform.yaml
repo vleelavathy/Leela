@@ -81,7 +81,8 @@ jobs:
           subscription-id: ${{ vars.ARM_SUBSCRIPTION_ID }}
 
       - uses: hashicorp/setup-terraform@v3
-
+        with:
+          terraform_version: 1.6.6
       - name: Download tfplan
         uses: actions/download-artifact@v4
         with:
