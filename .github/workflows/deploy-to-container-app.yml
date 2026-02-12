@@ -107,7 +107,10 @@ jobs:
             --name "${{ env.CONTAINER_APP }}" \
             --resource-group "${{ env.RESOURCE_GROUP }}" \
             --image "${{ steps.acr.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:latest" \
-            --set-env-vars DEPLOYED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" SOURCE_TAG="${{ steps.image.outputs.image_tag }}"
+            --registry-server "${{ steps.acr.outputs.acr_login_server }}" \
+            --registry-username "${{ vars.ACR_USERNAME }}" \
+            --registry-password "${{ secrets.ACR_PASSWORD }}" \
+            --set-env-vars DEPLOYED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" SOURCE_TAG="latest"
 
       # -------------------------
       # Verify deployment
