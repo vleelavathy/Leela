@@ -32,6 +32,7 @@ module "vnet" {
 #   environment = var.environment
 #   appName = var.appName
 #   resource_group = var.resource_group
+#   count = 1
 # }
 
 module "acr" {

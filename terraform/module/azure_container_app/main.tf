@@ -1,17 +1,4 @@
-# -------------------------
-# Log Analytics (required for ACA env)
-# -------------------------
-resource "azurerm_log_analytics_workspace" "law" {
-  name                = "${var.appName}-${var.location}-${var.environment}-law"
-  location            = var.location
-  resource_group_name = var.resource_group
-  sku                 = "PerGB2018"
-  retention_in_days   = 30
-    tags = {
-    Environment = var.environment
-    Owner       = var.owner
-  }
-}
+
 
 data "azurerm_container_environment" "cae" {
   name                = "${var.appName}-${var.location}-${var.environment}-cae"
@@ -22,7 +9,7 @@ data "azurerm_container_environment" "cae" {
 # Container App (public ingress)
 # -------------------------
 resource "azurerm_container_app" "app" {
-  name                         = "${var.appName}-${var.location}-${var.environment}-aca"
+  name                         = "${var.appName}-${var.location}-${var.environment}-aca-${var.count}"
   container_app_environment_id = data.azurerm_container_environment.cae.id
   resource_group_name          = var.resource_group
   revision_mode                = "Single"
