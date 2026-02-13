@@ -44,7 +44,7 @@ variable "owner" {
   default     = "Admin"
 }
 
-variable "count" {
+variable "index" {
   description = "Count of container apps to deploy"
   type        = string
 }

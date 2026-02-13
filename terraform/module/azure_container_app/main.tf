@@ -9,7 +9,7 @@ data "azurerm_container_environment" "cae" {
 # Container App (public ingress)
 # -------------------------
 resource "azurerm_container_app" "app" {
-  name                         = "${var.appName}-${var.location}-${var.environment}-aca-${var.count}"
+  name                         = "${var.appName}-${var.location}-${var.environment}-aca-${var.index}"
   container_app_environment_id = data.azurerm_container_environment.cae.id
   resource_group_name          = var.resource_group
   revision_mode                = "Single"

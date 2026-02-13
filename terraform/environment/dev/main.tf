@@ -32,7 +32,7 @@ module "aca-01" {
   environment = var.environment
   appName = var.appName
   resource_group = var.resource_group
-  count = 01
+  index = 01
 }
 
 module "acr" {
