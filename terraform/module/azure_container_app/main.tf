@@ -1,6 +1,6 @@
 
 
-data "azurerm_container_environment" "cae" {
+data "azurerm_container_app_environment" "cae" {
   name                = "${var.appName}-${var.location}-${var.environment}-cae"
   resource_group_name = var.resource_group
 }
@@ -10,7 +10,7 @@ data "azurerm_container_environment" "cae" {
 # -------------------------
 resource "azurerm_container_app" "app" {
   name                         = "${var.appName}-${var.location}-${var.environment}-aca-${var.index}"
-  container_app_environment_id = data.azurerm_container_environment.cae.id
+  container_app_environment_id = data.azurerm_container_app_environment.cae.id
   resource_group_name          = var.resource_group
   revision_mode                = "Single"
 
