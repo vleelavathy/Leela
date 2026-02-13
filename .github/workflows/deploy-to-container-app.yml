@@ -79,7 +79,7 @@ jobs:
         id: set-acr-credentials
         run: |
             az containerapp registry set \
-            --name le-app-westus2-dev-aca \
+            --name le-app-westus2-dev-aca-1 \
             --resource-group le-app-westus2-dev-rg \
             --server westus2devacr.azurecr.io \
             --username ${{ vars.ACR_USERNAME }} \
