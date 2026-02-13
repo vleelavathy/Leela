@@ -33,7 +33,7 @@ env:
   IMAGE_NAME: currency-dashboard
   APP_NAME: le-app
   REGION: westus2
-  CONTAINER_APP: le-app-westus2-dev-aca
+  CONTAINER_APP: le-app-westus2-dev-aca-1
   RESOURCE_GROUP: le-app-westus2-dev-rg
 
 jobs:
