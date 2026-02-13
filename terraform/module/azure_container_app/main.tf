@@ -1,5 +1,3 @@
-
-
 data "azurerm_container_app_environment" "cae" {
   name                = "${var.appName}-${var.location}-${var.environment}-cae"
   resource_group_name = var.resource_group
