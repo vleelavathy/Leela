@@ -45,13 +45,13 @@ module "aca-02" {
   index = 02
 }
 
-# module "acr" {
-#   source = "../../module/azure_container_registry"
-#   location = var.location
-#   environment = var.environment
-#   appName = var.appName
-#   resource_group = var.resource_group
-# }
+module "acr" {
+  source = "../../module/azure_container_registry"
+  location = var.location
+  environment = var.environment
+  appName = var.appName
+  resource_group = var.resource_group
+}
 
 
 module "azurerm_log_analytics_workspace"{
