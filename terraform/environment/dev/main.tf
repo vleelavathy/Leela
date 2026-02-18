@@ -69,3 +69,12 @@ module "azurerm_container_app_environment" {
   appName = var.appName
   resource_group = var.resource_group 
 }
+
+module "appservice_plan" {
+  source = "../../module/azure_appservice_plan"
+  location = var.location
+  owner = var.owner
+  environment = var.environment
+  appName = var.appName
+  resource_group = var.resource_group
+}
