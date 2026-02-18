@@ -7,7 +7,7 @@ resource "azurerm_container_registry" "acr" {
   location            = var.location
 
   sku           = "Standard"
-  admin_enabled = false
+  admin_enabled = true
 
   public_network_access_enabled = true
 

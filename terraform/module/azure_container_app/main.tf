@@ -34,6 +34,17 @@ resource "azurerm_container_app" "app" {
     max_replicas = 2
   }
 
+  secret {
+    name = "container-registry-credentials"
+    value = var.acr_password
+  }
+
+  registry {
+    server   = var.container_registry_server
+    username = var.container_username
+    password_secret_name = "container-registry-credentials"
+  }
+
   ingress {
     external_enabled = true
     target_port      = var.container_port
@@ -48,4 +59,11 @@ tags = {
     Environment = var.environment
     Owner       = var.owner
   }
+
+  lifecycle {
+    ignore_changes = [
+      template[0].container[0].image
+    ]
+  }
+  
 }

@@ -31,3 +31,22 @@ variable "environment_variables" {
 	type        = map(string)
 	default     = {}
 }
+
+variable "container_registry_server" {
+	description = "Container registry server (e.g., myacr.azurecr.io)"
+	type        = string
+	default     = ""
+}
+
+variable "container_username" {
+	description = "Container registry username"
+	type        = string
+	default     = ""
+}
+
+variable "acr_password" {
+	description = "Container registry password (stored as a secret)"
+	type        = string
+	default     = ""
+}
+
