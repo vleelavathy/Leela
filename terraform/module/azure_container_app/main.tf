@@ -34,17 +34,6 @@ resource "azurerm_container_app" "app" {
     max_replicas = 2
   }
 
-  secret {
-    name = "container-registry-credentials"
-    value = var.acr_password
-  }
-
-  registry {
-    server   = var.container_registry_server
-    username = var.container_username
-    password_secret_name = "container-registry-credentials"
-  }
-
   ingress {
     external_enabled = true
     target_port      = var.container_port
@@ -60,10 +49,26 @@ tags = {
     Owner       = var.owner
   }
 
-  lifecycle {
-    ignore_changes = [
-      template[0].container[0].image
-    ]
-  }
-  
+lifecycle {
+  ignore_changes = [
+    # image changes should not redeploy
+    template[0].container[0].image,
+
+    # if your pipeline injects dynamic env vars like DEPLOYED_AT, SOURCE_TAG
+    template[0].container[0].env,
+
+    # if probes are being modified outside TF (portal/az cli)
+    template[0].container[0].liveness_probe,
+    template[0].container[0].readiness_probe,
+    template[0].container[0].startup_probe,
+
+    # if secrets/registry creds are managed outside TF or auto-generated
+    secret,
+    registry,
+
+    # if identity is being set outside TF and you don't want TF to fight it
+    identity
+  ]
+}
+
 }
