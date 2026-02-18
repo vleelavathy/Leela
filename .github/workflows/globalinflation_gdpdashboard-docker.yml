@@ -19,7 +19,7 @@ permissions:
 env:
   REGISTRY_NAME: westus2devacr
   IMAGE_NAME: globalinflation_gdpdashboard
-  DOCKERFILE_PATH: .github/globalinflation_gdpdashboard/Dockerfile
+  DOCKERFILE_PATH: .github/docker/globalinflation_gdpdashboard/Dockerfile
   SOURCE_LOCATION: ./globalinflation_gdpdashboard
 
 jobs:
