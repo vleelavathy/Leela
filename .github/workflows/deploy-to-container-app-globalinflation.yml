@@ -1,0 +1,140 @@
+name: Deploy to Azure Container App Global Inflation
+
+on:
+#   workflow_run:
+#     workflows: ["Docker Build & Push to ACR"]
+#     types:
+#       - completed
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Select the environment"
+        required: true
+        type: choice
+        options:
+          - dev
+          - stg
+          - prd
+
+      who_deploys:
+        description: "Who is deploying?"
+        required: true
+        type: choice
+        options:
+          - Leela
+          - Sandosh
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  REGISTRY_NAME: westus2devacr
+  IMAGE_NAME: globalinflation_gdpdashboard
+  APP_NAME: le-app
+  REGION: westus2
+  CONTAINER_APP: le-app-westus2-dev-aca-2
+  RESOURCE_GROUP: le-app-westus2-dev-rg
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    env:
+      ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+    
+    steps:
+      # -------------------------
+      # Checkout
+      # -------------------------
+      - uses: actions/checkout@v4
+
+      # -------------------------
+      # Azure Login (OIDC)
+      # -------------------------
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.ARM_CLIENT_ID }}
+          tenant-id: ${{ vars.ARM_TENANT_ID }}
+          subscription-id: ${{ vars.ARM_SUBSCRIPTION_ID }}
+
+      # -------------------------
+      # Get ACR login server
+      # -------------------------
+      - name: Get ACR login server
+        id: acr
+        run: |
+          ACR_LOGIN_SERVER=$(az acr show \
+            --name "${REGISTRY_NAME}" \
+            --query loginServer -o tsv)
+          
+          echo "acr_login_server=${ACR_LOGIN_SERVER}" >> $GITHUB_OUTPUT
+          echo "ACR Login Server: ${ACR_LOGIN_SERVER}"
+
+    #   # -------------------------
+    #   # Set registry credentials
+    #   # -------------------------
+      - name: Get ACR login server
+        id: set-acr-credentials
+        run: |
+            az containerapp registry set \
+            --name le-app-westus2-dev-aca-1 \
+            --resource-group le-app-westus2-dev-rg \
+            --server westus2devacr.azurecr.io \
+            --username ${{ vars.ACR_USERNAME }} \
+            --password "${{ secrets.ACR_PASSWORD }}"
+
+
+
+      # -------------------------
+      # Update Container App image
+      # -------------------------
+      - name: Update Container App
+        run: |
+          az containerapp update \
+            --name "${{ env.CONTAINER_APP }}" \
+            --resource-group "${{ env.RESOURCE_GROUP }}" \
+            --image "${{ steps.acr.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:latest" \
+            --set-env-vars DEPLOYED_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" SOURCE_TAG="latest"
+
+      # -------------------------
+      # Verify deployment
+      # -------------------------
+      - name: Verify deployment
+        run: |
+          echo "Waiting for Container App to be ready..."
+          sleep 10
+          
+          # Get the current image
+          CURRENT_IMAGE=$(az containerapp show \
+            --name "${{ env.CONTAINER_APP }}" \
+            --resource-group "${{ env.RESOURCE_GROUP }}" \
+            --query "properties.template.containers[0].image" -o tsv)
+          
+          echo "Current image deployed: ${CURRENT_IMAGE}"
+          
+          # Get the app URL
+          APP_URL=$(az containerapp show \
+            --name "${{ env.CONTAINER_APP }}" \
+            --resource-group "${{ env.RESOURCE_GROUP }}" \
+            --query "properties.ingress.fqdn" -o tsv)
+          
+          echo "App URL: https://${APP_URL}"
+
+      # -------------------------
+      # Deployment summary
+      # -------------------------
+      - name: Deployment Summary
+        run: |
+          cat << EOF
+          =====================================
+          Deployment Summary
+          =====================================
+          Environment:    ${{ env.ENVIRONMENT }}
+          Container App:  ${{ env.CONTAINER_APP }}
+          Resource Group: ${{ env.RESOURCE_GROUP }}
+          Image:          ${{ steps.acr.outputs.acr_login_server }}/${{ env.IMAGE_NAME }}:latest
+          Status:         ✓ Deployment Complete
+          =====================================
+          EOF
