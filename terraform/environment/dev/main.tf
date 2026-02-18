@@ -35,6 +35,16 @@ module "aca-01" {
   index = 01
 }
 
+module "aca-02" {
+  source = "../../module/azure_container_app"
+  location = var.location
+  environment_variables = var.environment_variables
+  environment = var.environment
+  appName = var.appName
+  resource_group = var.resource_group
+  index = 02
+}
+
 module "acr" {
   source = "../../module/azure_container_registry"
   location = var.location
