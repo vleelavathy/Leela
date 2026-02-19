@@ -77,8 +77,8 @@ module "azurerm_container_app_environment" {
   resource_group = var.resource_group 
 }
 
-module "appservice_plan" {
-  source = "../../module/azure_appservice_plan"
+module "webapp" {
+  source = "../../module/webapp"
   location = var.location
   owner = var.owner
   environment = var.environment
