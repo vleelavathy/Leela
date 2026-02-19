@@ -1,5 +1,5 @@
 resource "azurerm_service_plan" "plan" {
-  name                = "${var.appname}-${var.environment}-plan"
+  name                = "${var.appName}-${var.environment}-plan"
   resource_group_name = var.resource_group
   location            = var.location
   os_type             = "Linux"
@@ -7,7 +7,7 @@ resource "azurerm_service_plan" "plan" {
 }
 
 resource "azurerm_linux_web_app" "web" {
-  name                = "${var.appname}-${var.environment}-web"
+  name                = "${var.appName}-${var.environment}-web"
   resource_group_name =  var.resource_group
   location            =  var.location
   service_plan_id     = azurerm_service_plan.plan.id
