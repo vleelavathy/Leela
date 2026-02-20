@@ -77,11 +77,10 @@ module "azurerm_container_app_environment" {
   resource_group = var.resource_group 
 }
 
-module "webapp" {
-  source = "../../module/webapp"
+module "keyvault" {
+  source = "../../module/azure_keyvault"
   location = var.location
-  owner = var.owner
   environment = var.environment
   appName = var.appName
-  resource_group = var.resource_group
-}
+  resource_group = var.resource_group 
+} 
