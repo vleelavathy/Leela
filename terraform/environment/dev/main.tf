@@ -32,6 +32,10 @@ module "aca-01" {
   environment = var.environment
   appName = var.appName
   resource_group = var.resource_group
+  container_registry_server = var.container_registry_server
+  container_username = var.container_username
+  acr_password = var.acr_password
+  
   index = 01
 }
 
@@ -42,6 +46,9 @@ module "aca-02" {
   environment = var.environment
   appName = var.appName
   resource_group = var.resource_group
+  container_registry_server = var.container_registry_server
+  container_username = var.container_username
+  acr_password = var.acr_password
   index = 02
 }
 
@@ -69,3 +76,11 @@ module "azurerm_container_app_environment" {
   appName = var.appName
   resource_group = var.resource_group 
 }
+
+module "keyvault" {
+  source = "../../module/azure_keyvault"
+  location = var.location
+  environment = var.environment
+  appName = var.appName
+  resource_group = var.resource_group 
+} 

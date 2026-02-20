@@ -48,4 +48,27 @@ tags = {
     Environment = var.environment
     Owner       = var.owner
   }
+
+lifecycle {
+  ignore_changes = [
+    # image changes should not redeploy
+    template[0].container[0].image,
+
+    # if your pipeline injects dynamic env vars like DEPLOYED_AT, SOURCE_TAG
+    template[0].container[0].env,
+
+    # if probes are being modified outside TF (portal/az cli)
+    template[0].container[0].liveness_probe,
+    template[0].container[0].readiness_probe,
+    template[0].container[0].startup_probe,
+
+    # if secrets/registry creds are managed outside TF or auto-generated
+    secret,
+    registry,
+
+    # if identity is being set outside TF and you don't want TF to fight it
+    identity
+  ]
+}
+
 }
