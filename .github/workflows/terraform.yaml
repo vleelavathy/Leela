@@ -63,14 +63,24 @@ jobs:
 
 
   # ---------------------------
+  # APPROVAL GATE
+  # ---------------------------
+  approval:
+    needs: terraform-plan
+    runs-on: ubuntu-latest
+    environment: ${{ needs.terraform-plan.outputs.env_name }}
+    
+    steps:
+      - name: Wait for Approval
+        run: echo "✅ Terraform plan approved. Proceeding with apply..."
+
+
+  # ---------------------------
   # APPLY JOB (MANUAL APPROVAL)
   # ---------------------------
   terraform-apply:
-    needs: terraform-plan
+    needs: [terraform-plan, approval]
     runs-on: ubuntu-latest
-
-    # ⭐ THIS IS THE MAGIC LINE
-    environment: ${{ needs.terraform-plan.outputs.env_name }}
 
     steps:
       - uses: actions/checkout@v4
