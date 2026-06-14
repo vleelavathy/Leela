@@ -1,6 +1,9 @@
 name: Terraform Deploy (Azure)
 
 on:
+  push:
+    branches:
+      - feature-leela
   workflow_dispatch:
     inputs:
       environment:
